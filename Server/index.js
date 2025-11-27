@@ -150,6 +150,8 @@ app.post("/like/:id", auth, async (req, res) => {
       likeCount: post.likeCount
     });
 
+
+
   } catch (err) {
     console.log("LIKE API ERROR:", err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -158,7 +160,124 @@ app.post("/like/:id", auth, async (req, res) => {
 
 
 
+app.post("/follow/:id",auth,async(req,res)=>{
+  let targetUserId=req.params.id;
+  let currentUserId=req.user._id
+  console.log(req.user,"hehh");
+  
+  if(targetUserId==currentUserId){
+    res.json({msg:"nashe kam kro thoda..."})
+  }
+    let targetUser=   await User.findById(targetUserId)
+   let currentUser=   await User.findById(currentUserId)
+   if(!currentUser || !targetUser){
+    res.send("user not found")
+   }
+
+   let alreadyFollw=currentUser.following.includes(targetUserId)
+   console.log(alreadyFollw,"helloo");
+   
+   if(alreadyFollw){
+    currentUser.following=     currentUser.following.filter((id)=>{
+      return id.toString()!=targetUserId
+
+    })
+   targetUser.followers=   targetUser.followers.filter((id)=>{
+      return id.toString()!=currentUserId
+
+  
+        
+    })
+         await currentUser.save()
+           await targetUser.save()
+           res.json("unfollowww.....")
+
+   }
+
+
+    //  followers
+    currentUser.following.push(targetUserId)
+    targetUser.followers.push(currentUserId)
+    await currentUser.save()
+    await targetUser.save()
+    res.json({msg:"followed succe......"})
+
+
+
+
+
+
+
+
+})
+
+
+
+
+
+
+
 app.listen(4000,()=>{
     console.log("server running on port no 4000");
     
 })
+
+
+// //Model   comment.js
+     
+// let mongoose=  require('mongoose')
+
+// let commenrtSchema=  new mongoose.Schema({
+//   comment:{
+//     type:String,
+//   },
+//   user:{
+//     type:mongoose.Schema.ObjectId,
+//     ref:"User"
+//   },
+//   post:{
+//      type:mongoose.Schema.ObjectId,
+//     ref:"Upload"
+
+//   }
+
+// })
+   
+//  let Comment=  mongoose.model("Comment",commenrtSchema)
+//  module.exports=Comment
+
+
+//   //api 
+
+//   app.post('/comment/:postId',  async(req,res)=>{
+//     let {postId}=req.params;
+//              let userID=     req.user._id
+//           let {text} =   req.body
+//           if(!text){
+//             res.send("textttt")
+
+//           }
+  
+//           let commentData=  new Comment({
+//             text,
+//             post:postId,
+//             user:userID
+            
+//           })
+         
+//        await commentData.save()
+//        return res.json({
+//         msg:"Comment added...",
+        
+//        })
+
+
+                
+
+//   })
+
+
+
+
+
+
