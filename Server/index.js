@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 let User=require('./User')
 let mongoose= require('mongoose')
 let Upload =require('./Upload')
+let Comment =require('./Coment')
 mongoose.connect('mongodb://127.0.0.1:27017/insta').then(()=>{
     console.log("db.....");
     
@@ -106,6 +107,21 @@ app.post('/upload', auth, async(req,res)=>{
 })
 
 
+// Uploads ko fetch karne ke liye
+app.get("/upload", auth, async (req, res) => {
+  try {
+    const posts = await Upload.find()
+      .populate("user", "name email")   // user ka naam chahiye
+      .sort({ createdAt: -1 });         // latest first (agar schema me timestamps: true hai)
+
+    res.json(posts);
+  } catch (err) {
+    console.error("GET /upload error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
 app.post("/like/:id", auth, async (req, res) => {
   try {
     const postId = req.params.id;
@@ -173,10 +189,13 @@ app.post("/follow/:id",auth,async(req,res)=>{
    if(!currentUser || !targetUser){
     res.send("user not found")
    }
-
    let alreadyFollow=currentUser.following.includes(targetUserId)
    console.log(alreadyFollow,"helloo");
+   console.log(alreadyFollow==targetUser);
    
+   
+         
+
    if (alreadyFollow) {
     currentUser.following = currentUser.following.filter(
       id => id.toString() !== targetUserId.toString()
@@ -195,6 +214,8 @@ app.post("/follow/:id",auth,async(req,res)=>{
     });
   }
     //  followers
+    console.log(currentUser== targetUser);
+    
     currentUser.following.push(targetUserId)
     targetUser.followers.push(currentUserId)
     await currentUser.save()
@@ -205,7 +226,7 @@ app.post("/follow/:id",auth,async(req,res)=>{
   // search?Q=
 // ankita
 // AN
- app.post("/search",auth,async(req,res)=>{
+ app.post("/search",async(req,res)=>{
       let query=   req.query.q
       if(!query){
         return  res.send("query not found")
@@ -223,9 +244,47 @@ app.post("/follow/:id",auth,async(req,res)=>{
           
  })
 
+// Current logged-in user ka profile
+app.get("/me", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("-passWord") // password mat bhejna
+      .populate("followers", "name email")
+      .populate("following", "name email");
 
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
 
-router.post("/:postId", async (req, res) => {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      followersCount: user.followers?.length || 0,
+      followingCount: user.following?.length || 0,
+      followers: user.followers || [],
+      following: user.following || [],
+    });
+  } catch (err) {
+    console.error("GET /me error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// Current user ke posts
+app.get("/my-posts", auth, async (req, res) => {
+  try {
+    const posts = await Upload.find({ user: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    console.error("GET /my-posts error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+app.post("/:postId", async (req, res) => {
   try {
     const { text, userId } = req.body;
     const { postId } = req.params;
@@ -253,7 +312,7 @@ router.post("/:postId", async (req, res) => {
   }
 });
 
-module.exports = router;
+
 
 
 
