@@ -33,7 +33,7 @@ app.post("/signUp", async (req, res) => {
   
       res.json({ msg: "Signup successful", user: newUser });
     } catch (err) {
-     return  res.status(500).json({ msg: "Error during signup", error: err.message });
+    return  res.status(500).json({ msg: "Error during signup", error: err.message });
     }
   });
 
@@ -194,9 +194,9 @@ app.post("/follow/:id",auth,async(req,res)=>{
    console.log(alreadyFollow==targetUser);
    
    
-         
+      
 
-   if (alreadyFollow) {
+  if (alreadyFollow) {
     currentUser.following = currentUser.following.filter(
       id => id.toString() !== targetUserId.toString()
     );

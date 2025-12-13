@@ -17,11 +17,11 @@ let uploadSchema=   mongoose.Schema({
     likedBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-      }]
+    }]
 
 
 })
 
- let Upload=   mongoose.model('Upload',uploadSchema)
+let Upload=   mongoose.model('Upload',uploadSchema)
 
- module.exports=Upload
+module.exports=Upload

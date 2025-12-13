@@ -5,10 +5,8 @@ import Sidebar from "./SideBar";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://indnuvfocupdtnylnchk.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImluZG51dmZvY3VwZHRueWxuY2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyODA0NDQsImV4cCI6MjA4MDg1NjQ0NH0.9W5T2MhEW16pjR0dNZDdE_T2jQkY-1xpy6bAIyGFXtM";
-
+const supabaseUrl = "https://arfpnhjnmtaasgmiaect.supabase.co";
+const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyZnBuaGpubXRhYXNnbWlhZWN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzY1MzUsImV4cCI6MjA4MTAxMjUzNX0.4AC7XdhcYKn8S0mDW2EkoN83IVqlhTilkpaxAQd_oMY";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const CreatePost = () => {
