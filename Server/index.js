@@ -5,7 +5,7 @@ let User=require('./User')
 let mongoose= require('mongoose')
 let Upload =require('./Upload')
 let Comment =require('./Coment')
-const Story= require('./story')
+const Story= require('./Story')
 require('dotenv').config()
 // mongoose.connect('mongodb://127.0.0.1:27017/insta').then(()=>{
 //     console.log("db.....");
