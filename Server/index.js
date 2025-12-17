@@ -5,12 +5,16 @@ let User=require('./User')
 let mongoose= require('mongoose')
 let Upload =require('./Upload')
 let Comment =require('./Coment')
-mongoose.connect('mongodb://127.0.0.1:27017/insta').then(()=>{
-    console.log("db.....");
+const Story= require('./story')
+require('dotenv').config()
+// mongoose.connect('mongodb://127.0.0.1:27017/insta').then(()=>{
+//     console.log("db.....");
     
+// })
+mongoose.connect('mongodb+srv://ashibarman:ashibarman567@cluster0.xghlqjf.mongodb.net/insta').then(()=>{
+    console.log("db.....");
 })
 let cors= require('cors')
-
 let app=  express()
 app.use(cors())
 app.use(express.json())
@@ -120,6 +124,40 @@ app.get("/upload", auth, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+app.post("/story",auth, async(req,res)=>{
+  const {mediaUrl}= req.body;
+  if(!mediaUrl) return res.status(400).json({msg:"mediaUrl required"});
+
+  const story= new Story({
+    mediaUrl,
+    user:req.user._id,
+    expiresAt: new Date(Date.now() + 24*60*60*1000), // expiresAt in seconds
+  })
+
+  await story.save();
+  res.json({msg:"Story uploaded"})
+});
+
+
+app.get("/stories", auth, async (req, res) => {
+  const me = await User.findById(req.user._id);
+
+  const allowedUsers = [
+    req.user._id,
+    ...me.following,
+    ...me.followers,
+  ];
+
+  const stories = await Story.find({
+    user: { $in: allowedUsers },
+    expiresAt: { $gt: new Date() }, // not expired
+  })
+    .populate("user", "name")
+    .sort({ createdAt: -1 });
+
+  res.json(stories);
+});
+
 
 
 app.post("/like/:id", auth, async (req, res) => {
@@ -130,7 +168,7 @@ app.post("/like/:id", auth, async (req, res) => {
     const post = await Upload.findById(postId);
     if (!post) return res.status(404).json({ success: false, message: "Post not found" });
 
-   
+  
     post.likedBy = post.likedBy.filter(id => id !== null);
 
 
@@ -312,19 +350,19 @@ app.post("/:postId", async (req, res) => {
   }
 });
 
+app.post("/story",auth, async(req,res)=>{
+  const {mediaUrl}= req.body;
+  if(!mediaUrl) return res.status(400).json({msg:"mediaUrl required"});
 
+  const story= new Story({
+    mediaUrl,
+    user:req.user._id,
+    expiresAt: new Date(Date.now() + 24*60*60*1000), // expiresAt in seconds
+  })
 
-
-
-
-
-
-
-
-
-
-
-
+  await story.save();
+  res.json({msg:"Story uploaded"})
+});
 
 
 
@@ -334,6 +372,58 @@ app.listen(4000,()=>{
     console.log("server running on port no 4000");
     
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // //Model   comment.js
