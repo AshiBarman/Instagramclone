@@ -11,7 +11,7 @@ require('dotenv').config()
 //     console.log("db.....");
     
 // })
-mongoose.connect('mongodb+srv://ashibarman:ashibarman567@cluster0.xghlqjf.mongodb.net/insta').then(()=>{
+mongoose.connect(process.env.MONGO_Url).then(()=>{
     console.log("db.....");
 })
 let cors= require('cors')
@@ -103,7 +103,7 @@ app.post('/upload', auth, async(req,res)=>{
   }
   let uploadD = new Upload({
       imgUrl,
-      user: userId,      
+      user: userId,
       likedBy: []
   })
   await uploadD.save();
